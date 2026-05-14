@@ -212,9 +212,12 @@ void ejecutar_experimentos() {
     cout << "\n=Experimento 1: Construccion= " << endl;
     clock_t t1 = clock();
     while (getline(d1, linea)) {
-        if (!linea.empty()) grilla.insertar((uchar*)linea.c_str());
+        if (!linea.empty()){
+            if (linea.back()== '\r') linea.pop_back();
+            grilla.insertar((uchar*)linea.c_str());
+        }
     }
-    grilla.construirNiveles(); // Parte esencial de la S2
+    grilla.construirNiveles(); // construir niveles de la grilla
     clock_t t2 = clock();
     d1.close();
     cout << "Tiempo Carga/Construccion: " << (double)(t2 - t1) / CLOCKS_PER_SEC << "s" << endl;
@@ -224,7 +227,12 @@ void ejecutar_experimentos() {
     ifstream d2("D2.txt");
     if (!d2) { cout << "Error: No existe D2.txt" << endl; return; }
     vector<string> d2_palabras;
-    while (getline(d2, linea)) if (!linea.empty()) d2_palabras.push_back(linea);
+    while (getline(d2, linea)){
+        if (!linea.empty()){
+            if (linea.back() == '\r') linea.pop_back();
+            d2_palabras.push_back(linea);
+        }
+    }
     d2.close();
 
     // 2. Busqueda de elementos
@@ -232,7 +240,9 @@ void ejecutar_experimentos() {
     int encontradas = 0;
     clock_t t3 = clock();
     for (int i = 0; i < 10000 && i < (int)d2_palabras.size(); i++) {
-        if (grilla.buscar((uchar*)d2_palabras[i].c_str())) encontradas++;
+        if (grilla.buscar((uchar*)d2_palabras[i].c_str())){
+            encontradas++;
+        }
     }
     cout << "Palabras encontradas " << encontradas << "/" << "10000" << endl;
     cout << "Tiempo promedio busqueda (10k): " << (double)(clock() - t3) / CLOCKS_PER_SEC << "s" << endl;

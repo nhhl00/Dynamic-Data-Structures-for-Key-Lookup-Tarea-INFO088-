@@ -115,7 +115,7 @@ void insertar_elementos(Solucion1& sol, unsigned char* palabra){
         sol.v = nuevo_v;
         sol.capacidad = nueva_cap;
     }
-    // 2.encontrar posicion correcta
+    // encontrar posicion correcta
     int pos = sol.size_v;
     for (int i = 0; i < sol.size_v; i++) {
         if (strcmp((char*)palabra, (char*)sol.v[i]) <= 0) {
@@ -124,37 +124,37 @@ void insertar_elementos(Solucion1& sol, unsigned char* palabra){
         }
     }
 
-    // 3.desplazar elementos a la derecha
+    // desplazar elementos a la derecha
     for (int i = sol.size_v; i > pos; i--)
         sol.v[i] = sol.v[i-1];
 
-    // 4.insertar palabra
+    // insertar palabra
     sol.v[pos] = palabra;
     sol.size_v++;
 
-    // 5.actualizar intervalo[]
+    // actualizar intervalo
     intervalos_indice(sol);
 }
 
 void eliminar_elementos(Solucion1& sol, unsigned char* palabra) {
-    // 1. buscar la palabra
+    // buscar la palabra
     int idx = buscar_elementos(sol, palabra);
     if (idx == -1) {
         return;
     }
-    // 3. borrar memoria basura
+    // borrar memoria basura
     delete[] sol.v[idx];
     sol.v[idx] = nullptr;
 
-    // 4. desplazar elementos a la izquierda
+    // desplazar elementos a la izquierda
     for (int i = idx; i < sol.size_v - 1; i++)
         sol.v[i] = sol.v[i+1];
 
-    // 5. dejar ultima celda en nullptr
+    // dejar ultima celda en nullptr
     sol.v[sol.size_v - 1] = nullptr;
     sol.size_v--;
 
-    // 6. actualizar intervalo[]
+    // actualizar intervalo[]
     intervalos_indice(sol);
 }
 
