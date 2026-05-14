@@ -204,11 +204,12 @@ void ejecutar_experimentos() {
     Solucion2 grilla;
     string linea;
 
+    cout << "\n==EXPERIMENTOS: SOLUCION 2== " << endl;
     // 1. Carga de D1.txt (Experimento de Construcción)
     ifstream d1("D1.txt");
     if (!d1) { cout << "Error: No existe D1.txt" << endl; return; }
 
-    cout << "S2: Cargando D1.txt..." << endl;
+    cout << "\n=Experimento 1: Construccion= " << endl;
     clock_t t1 = clock();
     while (getline(d1, linea)) {
         if (!linea.empty()) grilla.insertar((uchar*)linea.c_str());
@@ -216,39 +217,44 @@ void ejecutar_experimentos() {
     grilla.construirNiveles(); // Parte esencial de la S2
     clock_t t2 = clock();
     d1.close();
-    cout << "Tiempo Carga/Construccion S2: " << (double)(t2 - t1) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Tiempo Carga/Construccion: " << (double)(t2 - t1) / CLOCKS_PER_SEC << "s" << endl;
     cout << "Memoria Construccion niveles: " << grilla.calcular_memoria() / 1024.0 << " KB" << endl; // memoria usada en la construccion
 
-    // 2. Operaciones con D2.txt (Experimento de Rendimiento)
+    // Operaciones con D2.txt
     ifstream d2("D2.txt");
     if (!d2) { cout << "Error: No existe D2.txt" << endl; return; }
     vector<string> d2_palabras;
     while (getline(d2, linea)) if (!linea.empty()) d2_palabras.push_back(linea);
     d2.close();
 
-    // Búsqueda (10k)
+    // 2. Busqueda de elementos
+    cout << "\n=Experinento 2: Busqueda= " << endl;
+    int encontradas = 0;
     clock_t t3 = clock();
     for (int i = 0; i < 10000 && i < (int)d2_palabras.size(); i++) {
-        grilla.buscar((uchar*)d2_palabras[i].c_str());
+        if (grilla.buscar((uchar*)d2_palabras[i].c_str())) encontradas++;
     }
-    cout << "S2: Tiempo Buscar (10k): " << (double)(clock() - t3) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Palabras encontradas " << encontradas << "/" << "10000" << endl;
+    cout << "Tiempo promedio busqueda (10k): " << (double)(clock() - t3) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Memoria busqueda: " << grilla.calcular_memoria() / 1024.0 << " KB (igual que construccion)" << endl;
 
-    // Inserción (5k)
+    // Inserción (5000 primeras)
+    cout << "\n=Experimento 3: Insercion/Eliminacion= " << endl;
     clock_t t5 = clock();
     for (int i = 0; i < 5000 && i < (int)d2_palabras.size(); i++){
         grilla.insertar((uchar*)d2_palabras[i].c_str());
     }
-    cout << "S2: Tiempo Insertar (5k): " << (double)(clock() - t5) / CLOCKS_PER_SEC << "s" << endl;
-    cout << "S2: Memoria tras insercion: " << grilla.calcular_memoria() / 1024.0 << " KB" << endl;
+    cout << "Tiempo insertar (5k): " << (double)(clock() - t5) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Memoria tras insercion: " << grilla.calcular_memoria() / 1024.0 << " KB" << endl;
 
-    // Eliminación (5k)
+    // Eliminación (5000 ultimas)
     clock_t t7 = clock();
     int inicio = max(0, (int)d2_palabras.size() - 5000);
     for (int i = inicio; i < (int)d2_palabras.size(); i++){
         grilla.eliminar((uchar*)d2_palabras[i].c_str());
     }
-    cout << "S2: Tiempo Eliminar (5k): " << (double)(clock() - t7) / CLOCKS_PER_SEC << "s" << endl;
-    cout << "S2: Memoria tras Eliminacion: " << grilla.calcular_memoria() / 1024.0 << " KB" << endl;
+    cout << "Tiempo Eliminar (5k): " << (double)(clock() - t7) / CLOCKS_PER_SEC << "s" << endl;
+    cout << "Memoria tras Eliminacion: " << grilla.calcular_memoria() / 1024.0 << " KB" << endl;
 }
 
 int main() {

@@ -32,6 +32,9 @@ void intervalos_indice(Solucion1& sol);
 int buscar_elementos(Solucion1& sol, unsigned char* palabra);
 void insertar_elementos(Solucion1& sol, unsigned char* palabra);
 void eliminar_elementos(Solucion1& sol, unsigned char* palabra);
+long calcular_memoria(Solucion1& sol);
+void randomizar(vector<unsigned char*>& vec);
+void experimento(Solucion1& sol);
 
 // construir vector d1 a partir de diccionario D1
 void construir_vector(Solucion1& sol, string archivo){
@@ -174,20 +177,36 @@ void randomizar(vector<unsigned char*>& vec) {
     }
 }
 
-void experimento(Solucion1& sol, vector<unsigned char*>& d2) {
+void experimento(Solucion1& sol){
     clock_t t;
         float avgT;
 
+        cout << "\n==EXPERIMENTOS: SOLUCION 1== " << endl;
         // experimento 1
-        cout << "\n=== Experimento 1: Construccion ===" << endl;
+        cout << "\n=Experimento 1: Construccion= " << endl;
         t = clock();
         construir_vector(sol, "D1.txt");
         t = clock() - t;
-        cout << "Tiempo: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
-        cout << "Memoria: " << calcular_memoria(sol) / 1024.0 << " KB" << endl;
+        cout << "Tiempo construccion: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
+        cout << "Memoria construccion vector: " << calcular_memoria(sol) / 1024.0 << " KB" << endl;
+
+        // cargar D2 dentro de experimento
+          vector<unsigned char*> d2;
+          ifstream archivo("D2.txt");
+          string linea;
+          while (getline(archivo, linea)){
+              if (!linea.empty()){
+                  if (linea.back() == '\r') linea.pop_back();
+                  unsigned char* palabra = new unsigned char[linea.size() + 1];
+                  for (int i = 0; i <= (int)linea.size(); i++)
+                      palabra[i] = (unsigned char)linea[i];
+                  d2.push_back(palabra);
+              }
+          }
+          archivo.close();
 
         // experimento 2
-        cout << "\n=== Experimento 2: Busqueda ===" << endl;
+        cout << "\n=Experimento 2: Busqueda= " << endl;
         intervalos_indice(sol);
         srand(time(NULL));
         int encontradas = 0;
@@ -196,11 +215,12 @@ void experimento(Solucion1& sol, vector<unsigned char*>& d2) {
             if (buscar_elementos(sol, d2[rand() % d2.size()]) >= 0) encontradas++;
         }
         t = clock() - t;
-        cout << "Encontradas: " << encontradas << "/" << REPET << endl;
-        cout << "Tiempo promedio: " << (float)t / CLOCKS_PER_SEC / REPET << " s" << endl;
+        cout << "Palabras encontradas: " << encontradas << "/" << REPET << endl;
+        cout << "Tiempo promedio busqueda(10k): " << (float)t / CLOCKS_PER_SEC / REPET << " s" << endl;
+        cout << "Memoria busqueda: " << calcular_memoria(sol) / 1024.0 << " KB (igual que construccion)" << endl;
 
         // experimento 3
-        cout << "\n=== Experimento 3: Insercion/Eliminacion ===" << endl;
+        cout << "\n=Experimento 3: Insercion/Eliminacion= " << endl;
         vector<unsigned char*> primeras(d2.begin(), d2.begin() + 5000);
         vector<unsigned char*> ultimas(d2.end() - 5000, d2.end());
         randomizar(primeras);
@@ -212,7 +232,7 @@ void experimento(Solucion1& sol, vector<unsigned char*>& d2) {
         t = clock();
         for (int i = 0; i < 5000; i++) { insertar_elementos(sol, primeras[i]); inserciones++; }
         t = clock() - t;
-        cout << "Inserciones: " << inserciones << " Tiempo: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
+        cout << "inserciones(5k): " << inserciones << " Tiempo inserciones: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
         cout << "Memoria tras insercion: " << calcular_memoria(sol) / 1024.0 << " KB" << endl;
 
         // eliminacion
@@ -223,26 +243,12 @@ void experimento(Solucion1& sol, vector<unsigned char*>& d2) {
             if (sol.size_v < antes) eliminaciones++;
         }
         t = clock() - t;
-        cout << "Eliminaciones: " << eliminaciones << " Tiempo: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
+        cout << "eliminaciones(5k): " << eliminaciones << " Tiempo eliminaciones: " << (float)t / CLOCKS_PER_SEC << "s" << endl;
         cout << "Memoria tras eliminacion: " << calcular_memoria(sol) / 1024.0 << " KB" << endl;
 }
 
 int main(){
     Solucion1 sol;
-    //cargar vector D2
-    vector<unsigned char*> d2;
-    ifstream archivo("D2.txt");
-    string linea;
-    while (getline(archivo, linea)){
-        if (!linea.empty()){
-            unsigned char* palabra = new unsigned char [linea.size() + 1];
-            for (int i = 0; i <= (int)linea.size(); i++){
-                palabra[i] = (unsigned char)linea[i];
-            }
-            d2.push_back(palabra);
-        }
-    }
-    archivo.close();
-    experimento(sol, d2);
+    experimento(sol);
     return 0;
 }
